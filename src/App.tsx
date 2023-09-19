@@ -7,7 +7,8 @@ function App() {
   );
   const [labels, setLabels] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
-  const [prediction, setPrediction] = useState<string>("");
+  const [prediction, setPrediction] = useState("");
+  const [txtString, setTxtString] = useState("");
   const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
@@ -31,8 +32,16 @@ function App() {
         const idxMax = argMax(scoresValues); // Get the index of the highest score
         const prediction = labels[idxMax]; // Get the label of the highest score
         setPrediction(prediction);
+        setTxtString((prev) => prev + " " + getEmoji(prediction));
       },
-      { includeSpectrogram: false, probabilityThreshold: 0.8 } // Can be tuned for different voices.
+      // Options: https://github.com/tensorflow/tfjs-models/blob/master/speech-commands/README.md
+      {
+        includeSpectrogram: false,
+        probabilityThreshold: 0.75,
+        overlapFactor: 0.8,
+        includeEmbedding: false,
+        invokeCallbackOnNoiseAndUnknown: true,
+      }
     );
     setTimeout(() => {
       model.stopListening();
@@ -46,6 +55,9 @@ function App() {
     setIsListening(false);
   }
 
+  function handleClear() {
+    setTxtString("");
+  }
   if (!ready) return <div>...loading</div>;
 
   return (
@@ -53,15 +65,15 @@ function App() {
       <h1>Speech Recognition</h1>
       <div>
         <button onClick={handleStart} disabled={isListening}>
-          Start
+          {isListening ? "Listening..." : "Start"}
         </button>
         <button onClick={handleStop} disabled={!isListening}>
           Stop
         </button>
-        <div>
-          {prediction ? <h3>{prediction}</h3> : <h3>No Voice Detected</h3>}
-        </div>
+        <button onClick={handleClear}>Clear</button>
       </div>
+      <h2>Prediction: {prediction}</h2>
+      <div>{txtString}</div>
     </>
   );
 }
@@ -71,4 +83,51 @@ export default App;
 // Retrieve the array key corresponding to the largest element in the array.
 function argMax(array: number[]) {
   return array.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
+}
+
+function getEmoji(text: string) {
+  switch (text) {
+    case "one":
+      return "1️⃣";
+    case "two":
+      return "2️⃣";
+    case "three":
+      return "3️⃣";
+    case "four":
+      return "4️⃣";
+    case "five":
+      return "5️⃣";
+    case "six":
+      return "6️⃣";
+    case "seven":
+      return "7️⃣";
+    case "eight":
+      return "8️⃣";
+    case "nine":
+      return "9️⃣";
+    case "zero":
+      return "0️⃣";
+    case "up":
+      return "⬆️";
+    case "down":
+      return "⬇️";
+    case "left":
+      return "⬅️";
+    case "right":
+      return "➡️";
+    case "go":
+      return "🟢";
+    case "stop":
+      return "🔴";
+    case "yes":
+      return "👍";
+    case "no":
+      return "👎";
+    case "_unknown_":
+      return "❓";
+    case "_background_noise_":
+      return "🎙️";
+    default:
+      return "";
+  }
 }
