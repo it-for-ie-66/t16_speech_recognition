@@ -37,10 +37,10 @@ function App() {
       // Options: https://github.com/tensorflow/tfjs-models/blob/master/speech-commands/README.md
       {
         includeSpectrogram: false,
-        probabilityThreshold: 0.75,
-        overlapFactor: 0.8,
+        probabilityThreshold: 0.9,
+        overlapFactor: 0.5,
         includeEmbedding: false,
-        invokeCallbackOnNoiseAndUnknown: true,
+        invokeCallbackOnNoiseAndUnknown: false,
       }
     );
     setTimeout(() => {
